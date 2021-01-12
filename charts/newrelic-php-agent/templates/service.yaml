@@ -1,0 +1,15 @@
+{{- if (include "newrelic-php-agent.areValuesValid" .) }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "newrelic-php-agent.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+{{ include "newrelic-php-agent.labels" . | indent 4 }}
+spec:
+  type: ClusterIP
+  ports:
+  - port: {{ .Values.agentPort }}
+  selector:
+{{ include "newrelic-php-agent.selectorLabels" . | indent 4 }}
+{{- end }}

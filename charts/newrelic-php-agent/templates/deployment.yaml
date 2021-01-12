@@ -1,0 +1,68 @@
+{{- if (include "newrelic-php-agent.areValuesValid" .) }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "newrelic-php-agent.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+{{ include "newrelic-php-agent.labels" . | indent 4 }}
+spec:
+  replicas: {{ .Values.replicas }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "newrelic-php-agent.name" . }}
+  template:
+    metadata:
+      labels:
+{{ include "newrelic-php-agent.labels" . | indent 8 }}
+    spec:
+      serviceAccountName: {{ template "newrelic-php-agent.serviceAccountName" . }}
+      {{- if .Values.image.pullSecrets }}
+      imagePullSecrets:
+      {{ toYaml .Values.image.pullSecrets | indent 8 }}
+      {{- end }}
+      containers:
+        - name: newrelic-php-agent
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+          imagePullPolicy: "{{ .Values.image.pullPolicy }}"
+          ports:
+            - containerPort: {{ .Values.agentPort }}
+{{/*          env:*/}}
+{{/*            - name: HOSTNAME*/}}
+{{/*              valueFrom:*/}}
+{{/*                fieldRef:*/}}
+{{/*                  apiVersion: v1*/}}
+{{/*                  fieldPath: spec.nodeName*/}}
+{{/*            - name: TAGS*/}}
+{{/*              {{- if $.Values.metricTags }}*/}}
+{{/*              value: clusterName:{{ include "newrelic-php-agent.cluster" .}} {{ include "newrelic-php-agent.statsdMetricTags" . }}*/}}
+{{/*              {{- else }}*/}}
+{{/*              value: clusterName:{{ include "newrelic-php-agent.cluster" .}}*/}}
+{{/*          {{- end }}*/}}
+          {{- if .Values.resources }}
+          resources:
+          {{ toYaml .Values.resources | indent 10 }}
+          {{- end }}
+{{/*          volumeMounts:*/}}
+{{/*            - name: config-volume*/}}
+{{/*              mountPath: /etc/opt/newrelic/*/}}
+{{/*      volumes:*/}}
+{{/*        - name: config-volume*/}}
+{{/*          configMap:*/}}
+{{/*            name: {{ template "newrelic-php-agent.fullname" . }}-config*/}}
+      {{- if $.Values.priorityClassName }}
+      priorityClassName: {{ $.Values.priorityClassName }}
+      {{- end }}
+      {{- if $.Values.nodeSelector }}
+      nodeSelector:
+      {{ toYaml $.Values.nodeSelector | indent 8 }}
+      {{- end }}
+      {{- if .Values.tolerations }}
+      tolerations:
+      {{ toYaml .Values.tolerations | indent 8 }}
+      {{- end }}
+      {{- if .Values.affinity }}
+      affinity:
+      {{ toYaml .Values.affinity | indent 8 }}
+      {{- end }}
+{{- end }}
