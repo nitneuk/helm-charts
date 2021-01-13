@@ -1,0 +1,15 @@
+{{- if (include "apm-php-agent.areValuesValid" .) }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "apm-php-agent.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+{{ include "apm-php-agent.labels" . | indent 4 }}
+spec:
+  type: ClusterIP
+  ports:
+  - port: {{ .Values.agentPort }}
+  selector:
+{{ include "apm-php-agent.selectorLabels" . | indent 4 }}
+{{- end }}

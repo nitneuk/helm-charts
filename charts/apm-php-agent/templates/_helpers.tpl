@@ -2,7 +2,7 @@
 {{/*
 Expand the name of the chart.
 */}}
-{{- define "newrelic-php-agent.name" -}}
+{{- define "apm-php-agent.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
@@ -11,7 +11,7 @@ Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 If release name contains chart name it will be used as a full name.
 */}}
-{{- define "newrelic-php-agent.fullname" -}}
+{{- define "apm-php-agent.fullname" -}}
 {{- if .Values.fullnameOverride -}}
 {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" -}}
 {{- else -}}
@@ -27,16 +27,16 @@ If release name contains chart name it will be used as a full name.
 {{/*
 Create chart name and version as used by the chart label.
 */}}
-{{- define "newrelic-php-agent.chart" -}}
+{{- define "apm-php-agent.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
 {{/*
 Common labels
 */}}
-{{- define "newrelic-php-agent.labels" -}}
-app.kubernetes.io/name: {{ include "newrelic-php-agent.name" . }}
-helm.sh/chart: {{ include "newrelic-php-agent.chart" . }}
+{{- define "apm-php-agent.labels" -}}
+app.kubernetes.io/name: {{ include "apm-php-agent.name" . }}
+helm.sh/chart: {{ include "apm-php-agent.chart" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
@@ -47,17 +47,17 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{/*
 Selector labels
 */}}
-{{- define "newrelic-php-agent.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "newrelic-php-agent.name" . }}
+{{- define "apm-php-agent.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "apm-php-agent.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
 Create the name of the service account to use
 */}}
-{{- define "newrelic-php-agent.serviceAccountName" -}}
+{{- define "apm-php-agent.serviceAccountName" -}}
 {{- if .Values.serviceAccount.create }}
-{{- default (include "newrelic-php-agent.fullname" .) .Values.serviceAccount.name }}
+{{- default (include "apm-php-agent.fullname" .) .Values.serviceAccount.name }}
 {{- else }}
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
@@ -66,7 +66,7 @@ Create the name of the service account to use
 {{/*
 Define the statsd metric tags
 */}}
-{{- define "newrelic-php-agent.statsdMetricTags" -}}
+{{- define "apm-php-agent.statsdMetricTags" -}}
 
 {{- range $k, $v := .Values.metricTags -}}
 {{- $joinTags := (printf "%v:%v " $k $v) -}}
@@ -77,7 +77,7 @@ Define the statsd metric tags
 {{/*
 Return the insightsKey
 */}}
-{{- define "newrelic-php-agent.insightsKey" -}}
+{{- define "apm-php-agent.insightsKey" -}}
 {{- if .Values.global}}
   {{- if .Values.global.insightsKey }}
       {{- .Values.global.insightsKey -}}
@@ -92,7 +92,7 @@ Return the insightsKey
 {{/*
 Return the cluster
 */}}
-{{- define "newrelic-php-agent.cluster" -}}
+{{- define "apm-php-agent.cluster" -}}
 {{- if .Values.global -}}
   {{- if .Values.global.cluster -}}
       {{- .Values.global.cluster -}}
@@ -120,7 +120,7 @@ Returns nrStaging
 {{/*
 Returns if the template should render, it checks if the required value cluster is set.
 */}}
-{{- define "newrelic-php-agent.areValuesValid" -}}
-{{- $cluster := include "newrelic-php-agent.cluster" . -}}
+{{- define "apm-php-agent.areValuesValid" -}}
+{{- $cluster := include "apm-php-agent.cluster" . -}}
 {{- and $cluster}}
 {{- end -}}
